@@ -1,3 +1,26 @@
+var userFormEl = document.querySelector("#user-form");
+var nameInputEl = document.querySelector("#username");
+var repoContainerEl = document.querySelector("#repos-container");
+var repoSearchTerm = document.querySelector("#repo-search-term");
+
+var formSubmitHandler = function(event) {
+    // prevent page fro, refreshing
+    event.preventDefault();
+   
+    // get value from input element
+    var username = nameInputEl.value.trim()
+
+    if (username) {
+        getUserRepos(username);
+
+        // clear old content
+        repoContainerEl.textContent = "";
+        nameInputEl.value = "";
+    } else {
+        alert("Please enter a Github username")
+    }
+};
+
 var getUserRepos = function(user) {
     // format the github api url
     var apiUrl = "https://api.github.com/users/" + user + "/repos";
@@ -7,38 +30,19 @@ var getUserRepos = function(user) {
         .then(function(response) {
         // request was succesful
         if(response.ok) {
+            console.log(response);
             response.json().then(function(data) {
+                console.log(data)
                 displayRepos(data, user);
             });
         } else {
-            alert("Error: Github User Not Found");
+            alert("Error: " + response.statusText);
         }         
     })
     .catch(function(error) {
         // Notice this '.catch()' getting chained onto the end of the '.this()' method
         alert("Unable to connect to GitHub")
     });
-};
-
-var userFormEl = document.querySelector("#user-form");
-var nameInputEl = document.querySelector("#username");
-
-// Dom elements
-var repoContainerEl = document.querySelector("#repos-container");
-var repoSearchTerm = document.querySelector("#repo-search-term")
-
-var formSubmitHandler = function(event) {
-    event.preventDefault();
-    //console.log(event);
-    // get value from input element
-    var username = nameInputEl.value.trim()
-
-    if (username) {
-        getUserRepos(username);
-        nameInputEl.value = "";
-    } else {
-        alert("Please enter a Github username")
-    }
 };
 
 var displayRepos = function(repos, searchTerm) {
@@ -48,11 +52,6 @@ var displayRepos = function(repos, searchTerm) {
         return;
     }
 
-    console.log(repos);
-    console.log(searchTerm);
-
-    // clear old content
-    repoContainerEl.textContent = "";
     repoSearchTerm.textContent = searchTerm;
 
     // loop over repos
@@ -91,6 +90,7 @@ var displayRepos = function(repos, searchTerm) {
     };
 };
 
+// add event listeners to forms
 userFormEl.addEventListener("submit", formSubmitHandler);
 
-getUserRepos();
+//getUserRepos();
